@@ -1,0 +1,64 @@
+module.exports = function (grunt) {
+    grunt.initConfig({
+			pkg: grunt.file.readJSON('package.json'),
+        autoprefixer: {
+            options: {
+                browsers: ["last 2 versions", "ie 8", "ie 9"],
+                map: true
+            },
+            single_file: {
+                src: "dist/style.css",
+                dest: "dist/style.css"
+            }
+        },
+        shell: {
+            tailwind: {
+                command: 'npx tailwindcss -i ./assets/sass/tailwind.scss -o ./assets/dist/tailwind.css'
+            }
+        },
+        watch: {
+            options: {
+                spawn: false,
+                livereload: true
+            },
+            stylesheets: {
+                files: ["assets/sass/**/*.scss"],
+                tasks: ["sass"]
+            },
+            tailwind: {
+                files: "*.php",
+                tasks: ["shell"]
+            },
+            scripts: {
+                files: "src/**/*.js",
+                tasks: ["jshint"]
+            }
+
+        },
+        jshint: {
+            options: {
+                esversion: 6,
+                reporter: require('jshint-stylish')
+            },
+            build: ['Gruntfile.js', 'src/js/main.js']
+        },
+        sass: {
+            options: {
+                style: "expanded"
+            },
+            dev: {
+                files: {
+                    "assets/dist/style.css": "assets/sass/index.scss"
+                }
+            }
+        },
+    });
+    
+    grunt.loadNpmTasks("grunt-autoprefixer");
+    grunt.loadNpmTasks("grunt-contrib-sass");
+    grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-shell");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    
+    grunt.registerTask("build", ["sass", "jshint", "shell", "watch"]);
+};
